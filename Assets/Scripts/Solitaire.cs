@@ -1,7 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Solitaire : MonoBehaviour
 {
@@ -25,6 +24,7 @@ public class Solitaire : MonoBehaviour
     public void PlayCards()
     {
         _deck = GenerateDeck();
+        _deck.Shuffle();
         
         //test the cards in the deck:
         foreach (var card in _deck)
