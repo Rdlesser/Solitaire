@@ -299,6 +299,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 247671711}
+  - component: {fileID: 247671713}
+  - component: {fileID: 247671712}
   m_Layer: 0
   m_Name: SplitaireGame
   m_TagString: Untagged
@@ -321,6 +323,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &247671712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247671710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1604945b525ab9c43b6acee1f4c69746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &247671713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247671710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab978e7a11d20e64facf9c97ee6d55e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deck: []
 --- !u!1 &318585911
 GameObject:
   m_ObjectHideFlags: 0
