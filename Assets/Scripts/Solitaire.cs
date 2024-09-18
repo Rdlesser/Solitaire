@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Solitaire : MonoBehaviour
 {
+
+    public Sprite[] CardFaces;
+    
     public static string[] Suits = new string[] { "C", "D", "H", "S" };
     public static string[] Values = new[] { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
