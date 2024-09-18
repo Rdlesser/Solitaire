@@ -88,6 +88,7 @@ public class UserInput : MonoBehaviour
     {
         Debug.Log("Deck Clicked");
         _solitaire.DealFromDeck();
+        _slot1 = gameObject;
     }
 
     private void HandleCardClick(GameObject selected)
