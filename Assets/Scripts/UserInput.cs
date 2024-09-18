@@ -5,6 +5,10 @@ public class UserInput : MonoBehaviour
 {
     [SerializeField] private GameObject _slot1;
     [SerializeField] private Solitaire _solitaire;
+
+    private float _timer;
+    private float _doubleClickTime = 0.3f;
+    private int _clickCount = 0;
     
     // Start is called before the first frame update
     void Start()
@@ -16,6 +20,22 @@ public class UserInput : MonoBehaviour
 
     void Update()
     {
+        if (_clickCount == 1)
+        {
+            _timer += Time.deltaTime;
+        }
+
+        if (_clickCount == 3)
+        {
+            _timer = 0;
+            _clickCount = 1;
+        }
+
+        if (_timer > _doubleClickTime)
+        {
+            _timer = 0;
+            _clickCount = 0;
+        }
         GetMouseClick();
     }
 
@@ -29,33 +49,36 @@ public class UserInput : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (Camera.main != null)
+            _clickCount++;
+            if (Camera.main == null)
             {
-                var mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10));
-                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                return;
+            }
 
-                if (hit)
+            var mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10));
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+            if (hit)
+            {
+                if (hit.collider.CompareTag(Tags.DECK))
                 {
-                    if (hit.collider.CompareTag(Tags.DECK))
-                    {
-                        // clicked deck
-                        HandleDeckClick();
-                    }
-                    else if (hit.collider.CompareTag(Tags.CARD))
-                    {
-                        // clicked card
-                        HandleCardClick(hit.collider.gameObject);
-                    }
-                    else if (hit.collider.CompareTag(Tags.TOP))
-                    {
-                        // clicked top
-                        HandleTopClick(hit.collider.gameObject);
-                    }
-                    else if (hit.collider.CompareTag(Tags.BOTTOM))
-                    {
-                        // clicked bottom
-                        HandleBottomClick(hit.collider.gameObject);
-                    }
+                    // clicked deck
+                    HandleDeckClick();
+                }
+                else if (hit.collider.CompareTag(Tags.CARD))
+                {
+                    // clicked card
+                    HandleCardClick(hit.collider.gameObject);
+                }
+                else if (hit.collider.CompareTag(Tags.TOP))
+                {
+                    // clicked top
+                    HandleTopClick(hit.collider.gameObject);
+                }
+                else if (hit.collider.CompareTag(Tags.BOTTOM))
+                {
+                    // clicked bottom
+                    HandleBottomClick(hit.collider.gameObject);
                 }
             }
         }
@@ -86,7 +109,19 @@ public class UserInput : MonoBehaviour
         {
             if (!IsBlocked(selected))
             {
-                _slot1 = selected;
+                if (_slot1 == selected)
+                {
+                    // same card clicked on twice
+                    if (IsDoubleClick())
+                    {
+                        // attempt auto stack
+                        AutoStack(selected);
+                    }
+                }
+                else
+                {
+                    _slot1 = selected;
+                }
             }
         }
 
@@ -104,6 +139,14 @@ public class UserInput : MonoBehaviour
             else
             {
                 _slot1 = selected;
+            }
+        }
+        else if (_slot1 == selected)
+        {
+            if (IsDoubleClick())
+            {
+                // Attempt auto stack
+                AutoStack(selected);
             }
         }
     }
@@ -273,5 +316,60 @@ public class UserInput : MonoBehaviour
                 return true;
             }
         }
+    }
+
+    private bool IsDoubleClick()
+    {
+        return _timer < _doubleClickTime && _clickCount == 2;
+    }
+
+    private void AutoStack(GameObject selected)
+    {
+        for (int i = 0; i < _solitaire.GetTopPosCount(); i++)
+        {
+            var topPosCard = _solitaire.GetTopPos(i).GetComponent<Selectable>();
+
+            if (selected.GetComponent<Selectable>().Value == 1) // if it is an ace
+            {
+                if (topPosCard.Value == 0) // and the top position is empty 
+                {
+                    _slot1 = selected;
+                    Stack(topPosCard.gameObject); // stack the ace up top
+                    break; // in the first empty position found
+                }
+            }
+            else
+            {
+                if (_solitaire.GetTopPos(i).GetComponent<Selectable>().Suit == _slot1.GetComponent<Selectable>().Suit && _solitaire.GetTopPos(i).GetComponent<Selectable>().Value == _slot1.GetComponent<Selectable>().Value - 1)
+                {
+                    // if it is the last card (has no children)
+                    if (DoesCardHaveChildren(_slot1))
+                    {
+                        return;
+                    }
+                    
+                    _slot1 = selected;
+
+                    // find a top spot that matches the conditions for auto stacking if it exists
+                    var lastCardName = topPosCard.Value switch
+                    {
+                        1 => $"{topPosCard.Suit}A",
+                        11 => $"{topPosCard.Suit}J",
+                        12 => $"{topPosCard.Suit}Q",
+                        13 => $"{topPosCard.Suit}K",
+                        _ => topPosCard.Suit + topPosCard.Value.ToString()
+                    };
+
+                    var lastCard = GameObject.Find(lastCardName);
+                    Stack(lastCard);
+                    break;
+                }
+            }
+        }
+    }
+
+    private bool DoesCardHaveChildren(GameObject card)
+    {
+        return card.transform.childCount != 0;
     }
 }

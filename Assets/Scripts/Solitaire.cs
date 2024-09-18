@@ -297,4 +297,14 @@ public class Solitaire : MonoBehaviour
     {
         return _bottoms[cardRow].Last() == cardName;
     }
+
+    public int GetTopPosCount()
+    {
+        return _topPos.Length;
+    }
+
+    public GameObject GetTopPos(int index)
+    {
+        return _topPos[index];
+    }
 }
