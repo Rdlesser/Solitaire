@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1604945b525ab9c43b6acee1f4c69746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _solitaire: {fileID: 247671713}
 --- !u!114 &247671713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,6 +550,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 15b41b0f3c8efff44985ad86eb9727ad, type: 3}
   - {fileID: 21300000, guid: d41115a889446584c858fbf9d6201449, type: 3}
   _cardPrefab: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
+  _deckButton: {fileID: 351256843}
   _bottomPos:
   - {fileID: 1992329131}
   - {fileID: 604371370}
@@ -562,11 +564,8 @@ MonoBehaviour:
   - {fileID: 163322216}
   - {fileID: 636744717}
   - {fileID: 1809572941}
-  _cardInitialYOffset: 0
-  _cardYOffsetIncrement: 0.3
-  _cardInitialZOffset: 0.03
-  _cardZOffsetIncrement: 0.03
   _deck: []
+  _discardPile: []
 --- !u!1 &318585911
 GameObject:
   m_ObjectHideFlags: 0

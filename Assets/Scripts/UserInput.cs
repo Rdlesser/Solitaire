@@ -1,14 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 
 public class UserInput : MonoBehaviour
 {
-
-    private const string DECK = "Deck";
-    private const string CARD = "Card";
-    private const string TOP = "Top";
-    private const string BOTTOM = "Bottom";
+    [SerializeField] private Solitaire _solitaire;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -34,22 +32,22 @@ public class UserInput : MonoBehaviour
 
                 if (hit)
                 {
-                    if (hit.collider.CompareTag(DECK))
+                    if (hit.collider.CompareTag(Tags.DECK))
                     {
                         // clicked deck
                         HandleDeckClick();
                     }
-                    else if (hit.collider.CompareTag(CARD))
+                    else if (hit.collider.CompareTag(Tags.CARD))
                     {
                         // clicked card
                         HandleCardClick();
                     }
-                    else if (hit.collider.CompareTag(TOP))
+                    else if (hit.collider.CompareTag(Tags.TOP))
                     {
                         // clicked top
                         HandleTopClick();
                     }
-                    else if (hit.collider.CompareTag(BOTTOM))
+                    else if (hit.collider.CompareTag(Tags.BOTTOM))
                     {
                         // clicked bottom
                         HandleBottomClick();
@@ -62,6 +60,7 @@ public class UserInput : MonoBehaviour
     private void HandleDeckClick()
     {
         Debug.Log("Deck Clicked");
+        _solitaire.DealFromDeck();
     }
     
     private void HandleCardClick()
