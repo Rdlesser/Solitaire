@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1604945b525ab9c43b6acee1f4c69746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _slot1: {fileID: 0}
   _solitaire: {fileID: 247671713}
 --- !u!114 &247671713
 MonoBehaviour:
@@ -564,6 +565,7 @@ MonoBehaviour:
   - {fileID: 163322216}
   - {fileID: 636744717}
   - {fileID: 1809572941}
+  _userInput: {fileID: 247671712}
   _deck: []
   _discardPile: []
 --- !u!1 &318585911
@@ -2398,6 +2400,10 @@ PrefabInstance:
     - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
       propertyPath: m_Name
       value: Card
+      objectReference: {fileID: 0}
+    - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

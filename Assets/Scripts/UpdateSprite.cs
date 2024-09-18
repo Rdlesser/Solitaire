@@ -10,6 +10,7 @@ public class UpdateSprite : MonoBehaviour
     [SerializeField] private Solitaire _solitaire;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Selectable _selectable;
+    [SerializeField] private UserInput _userInput;
     
     // Start is called before the first frame update
     void Start()
@@ -28,10 +29,17 @@ public class UpdateSprite : MonoBehaviour
     {
         //todo: shouldn't be here as it is wasteful - make it only update when needed
         _spriteRenderer.sprite = _selectable.IsFaceUp ? _cardFace : _cardBack;
+        
+        if (_userInput.GetSlot1())
+        {
+            // todo: change this to only happen when the card is clicked on instead of every cycle
+            _spriteRenderer.color = name == _userInput.GetSlot1().name ? Color.yellow : Color.white;
+        }
     }
 
-    public void InjectSolitaire(Solitaire solitaire)
+    public void Inject(Solitaire solitaire, UserInput userInput)
     {
         _solitaire = solitaire;
+        _userInput = userInput;
     }
 }

@@ -14,6 +14,7 @@ public class Solitaire : MonoBehaviour
     [SerializeField] private GameObject _deckButton;
     [SerializeField] private GameObject[] _bottomPos;
     [SerializeField] private GameObject[] _topPos;
+    [SerializeField] private UserInput _userInput;
     
     private float _cardInitialYOffset = 0f;
     private float _cardYOffsetIncrement = 0.3f;
@@ -121,13 +122,14 @@ public class Solitaire : MonoBehaviour
                 yield return new WaitForSeconds(0.01f);
                 var newCard = Instantiate(_cardPrefab, new Vector3(_bottomPos[i].transform.position.x, _bottomPos[i].transform.position.y - yOffset, _bottomPos[i].transform.position.z - zOffset), Quaternion.identity, _bottomPos[i].transform);
                 newCard.name = card;
+                newCard.GetComponent<Selectable>().Row = i;
 
                 if (card == _bottoms[i][_bottoms[i].Count - 1])
                 {
                     newCard.GetComponent<Selectable>().IsFaceUp = true;
                 }
                 
-                newCard.GetComponent<UpdateSprite>().InjectSolitaire(this);
+                newCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
 
                 yOffset += _cardYOffsetIncrement;
                 zOffset += _cardZOffsetIncrement;
@@ -231,8 +233,10 @@ public class Solitaire : MonoBehaviour
                 zOffset -= 0.2f;
                 newTopCard.name = card;
                 _tripsOnDisplay.Add(card);
-                newTopCard.GetComponent<Selectable>().IsFaceUp = true;
-                newTopCard.GetComponent<UpdateSprite>().InjectSolitaire(this);
+                var selectable = newTopCard.GetComponent<Selectable>();
+                selectable.IsFaceUp = true;
+                selectable.IsInDeckPile = true;
+                newTopCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
             }
 
             _deckLocation++;
