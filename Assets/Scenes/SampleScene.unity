@@ -563,8 +563,8 @@ MonoBehaviour:
   - {fileID: 636744717}
   - {fileID: 1809572941}
   _cardInitialYOffset: 0
-  _cardYOffsetIncrement: 0
-  _cardInitialZOffset: 0
+  _cardYOffsetIncrement: 0.3
+  _cardInitialZOffset: 0.03
   _cardZOffsetIncrement: 0.03
   _deck: []
 --- !u!1 &318585911
@@ -2398,10 +2398,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
       propertyPath: m_Name
-      value: Card
-      objectReference: {fileID: 0}
-    - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_TagString
       value: Card
       objectReference: {fileID: 0}
     m_RemovedComponents: []
