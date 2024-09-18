@@ -286,4 +286,14 @@ public class Solitaire : MonoBehaviour
         _topPos[index].GetComponent<Selectable>().Value = value;
         _topPos[index].GetComponent<Selectable>().Suit = suit;
     }
+
+    public bool IsLastCardInDraw(string cardName)
+    {
+        return _tripsOnDisplay.Last() == cardName;
+    }
+
+    public bool IsCardBlocked(string cardName, int cardRow)
+    {
+        return _bottoms[cardRow].Last() == cardName;
+    }
 }

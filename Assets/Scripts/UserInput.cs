@@ -76,10 +76,13 @@ public class UserInput : MonoBehaviour
         // card click actions
         if (!selected.GetComponent<Selectable>().IsFaceUp)
         {
-            // if the card clicked on is not blocked
-            // flip it over
-            selected.GetComponent<Selectable>().IsFaceUp = true;
-            _slot1 = gameObject;
+            // if the card clicked on is not blocked}
+            if (!IsBlocked(selected))
+            {
+                // flip it over
+                selected.GetComponent<Selectable>().IsFaceUp = true;
+                _slot1 = gameObject;
+            }
         }
 
         if (_slot1 == gameObject) // not null because we pass in this gameobject instead
@@ -219,5 +222,35 @@ public class UserInput : MonoBehaviour
         }
 
         _slot1 = gameObject;
+    }
+
+    private bool IsBlocked(GameObject selected)
+    {
+        var s2 = selected.GetComponent<Selectable>();
+
+        if (s2.IsInDeckPile)
+        {
+            if (_solitaire.IsLastCardInDraw(s2.name))
+            {
+                return false;
+            }
+            else
+            {
+                Debug.Log($"{s2.name} is blocked!");
+
+                return true;
+            }
+        }
+        else
+        {
+            if (_solitaire.IsCardBlocked(s2.name, s2.Row))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }
