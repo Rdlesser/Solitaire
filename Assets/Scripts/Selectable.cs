@@ -6,11 +6,24 @@ using UnityEngine;
 
 public class Selectable : MonoBehaviour
 {
+    [SerializeField] private bool _isTop = false;
+    [SerializeField] private int _row;
 
-    public bool IsTop { get; set; } = false;
+    public bool IsTop
+    {
+        get => _isTop;
+        set => _isTop = value;
+    }
+
     public string Suit { get; set; }
     public int Value { get; set; }
-    public int Row { get; set; }
+
+    public int Row
+    {
+        get => _row;
+        set => _row = value;
+    }
+    
     public bool IsFaceUp { get; set; }
     public bool IsInDeckPile { get; set; }
 

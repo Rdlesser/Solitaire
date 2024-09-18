@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using DefaultNamespace;
 using UnityEngine;
 
@@ -51,12 +49,12 @@ public class UserInput : MonoBehaviour
                     else if (hit.collider.CompareTag(Tags.TOP))
                     {
                         // clicked top
-                        HandleTopClick();
+                        HandleTopClick(hit.collider.gameObject);
                     }
                     else if (hit.collider.CompareTag(Tags.BOTTOM))
                     {
                         // clicked bottom
-                        HandleBottomClick();
+                        HandleBottomClick(hit.collider.gameObject);
                     }
                 }
             }
@@ -84,6 +82,13 @@ public class UserInput : MonoBehaviour
                 _slot1 = gameObject;
             }
         }
+        else if (selected.GetComponent<Selectable>().IsInDeckPile)
+        {
+            if (!IsBlocked(selected))
+            {
+                _slot1 = selected;
+            }
+        }
 
         if (_slot1 == gameObject) // not null because we pass in this gameobject instead
         {
@@ -103,14 +108,30 @@ public class UserInput : MonoBehaviour
         }
     }
 
-    private void HandleTopClick()
+    private void HandleTopClick(GameObject selected)
     {
         Debug.Log("Top Clicked");
+
+        if (_slot1.CompareTag(Tags.CARD))
+        {
+            if (_slot1.GetComponent<Selectable>().Value == 1)
+            {
+                Stack(selected);
+            }
+        }
     }
 
-    private void HandleBottomClick()
+    private void HandleBottomClick(GameObject selected)
     {
         Debug.Log("Bottom Clicked");
+        // if the card is a king and the empty slot is bottom then stack
+        if (_slot1.CompareTag(Tags.CARD))
+        {
+            if (_slot1.GetComponent<Selectable>().Value == 13)
+            {
+                Stack(selected);
+            }
+        }
     }
 
     private bool IsStackable(GameObject selected)
