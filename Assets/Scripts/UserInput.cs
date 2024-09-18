@@ -73,6 +73,15 @@ public class UserInput : MonoBehaviour
     {
         Debug.Log("Card Clicked");
 
+        // card click actions
+        if (!selected.GetComponent<Selectable>().IsFaceUp)
+        {
+            // if the card clicked on is not blocked
+            // flip it over
+            selected.GetComponent<Selectable>().IsFaceUp = true;
+            _slot1 = gameObject;
+        }
+
         if (_slot1 == gameObject) // not null because we pass in this gameobject instead
         {
             _slot1 = selected;
@@ -82,7 +91,7 @@ public class UserInput : MonoBehaviour
         {
             if (IsStackable(selected))
             {
-                
+                Stack(selected);
             }
             else
             {
@@ -103,14 +112,19 @@ public class UserInput : MonoBehaviour
 
     private bool IsStackable(GameObject selected)
     {
-        var selectable = _slot1.GetComponent<Selectable>();
-        var newSelectable = selected.GetComponent<Selectable>();
+        var s1 = _slot1.GetComponent<Selectable>();
+        var s2 = selected.GetComponent<Selectable>();
 
-        if (newSelectable.IsTop)
+        if (s2.IsInDeckPile)
         {
-            if (selectable.Suit == newSelectable.Suit || selectable.Value == 1 && newSelectable.Suit == null)
+            return false;
+        }
+        
+        if (s2.IsTop)
+        {
+            if (s1.Suit == s2.Suit || s1.Value == 1 && s2.Suit == null)
             {
-                if (selectable.Value == newSelectable.Value + 1)
+                if (s1.Value == s2.Value + 1)
                 {
                     return true;
                 }
@@ -122,17 +136,17 @@ public class UserInput : MonoBehaviour
         }
         else
         {
-            if (selectable.Value == newSelectable.Value - 1)
+            if (s1.Value == s2.Value - 1)
             {
                 var isSelectableRed = true;
                 var isNewSelectableRed = true;
 
-                if (selectable.Suit == "C" || selectable.Suit == "S")
+                if (s1.Suit == "C" || s1.Suit == "S")
                 {
                     isSelectableRed = false;
                 }
 
-                if (newSelectable.Suit == "C" || newSelectable.Suit == "S")
+                if (s2.Suit == "C" || s2.Suit == "S")
                 {
                     isNewSelectableRed = false;
                 }
@@ -153,5 +167,57 @@ public class UserInput : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void Stack(GameObject selected)
+    {
+        var s1 = _slot1.GetComponent<Selectable>();
+        var s2 = selected.GetComponent<Selectable>();
+
+        var yOffset = 0.3f;
+        var zOffset = 0.01f;
+
+        if (s2.IsTop || s1.Value == 13)
+        {
+            yOffset = 0;
+        }
+
+        _slot1.transform.position = new Vector3(selected.transform.position.x,
+            selected.transform.position.y - yOffset,
+            selected.transform.position.z - zOffset);
+
+        _slot1.transform.parent = selected.transform; // makes children move with parents
+
+        if (s1.IsInDeckPile)
+        {
+            _solitaire.RemoveTrip(_slot1.name);
+        }
+        else if (s1.IsTop && s2.IsTop && s1.Value == 1)
+        {
+            _solitaire.RemoveCardInTopPos(s1.Row);
+        }
+        else if (s1.IsTop)
+        {
+            _solitaire.ChangeTopPosValue(s1.Row, s1.Value - 1);
+        }
+        else
+        {
+            _solitaire.RemoveCardFromBottom(s1.Row, s1.name);
+        }
+
+        s1.IsInDeckPile = false;
+        s1.Row = s2.Row;
+
+        if (s2.IsTop)
+        {
+            _solitaire.AddCardToTopPos(s1.Row, s1.Value, s1.Suit);
+            s1.IsTop = true;
+        }
+        else
+        {
+            s1.IsTop = false;
+        }
+
+        _slot1 = gameObject;
     }
 }

@@ -258,4 +258,32 @@ public class Solitaire : MonoBehaviour
         _discardPile.Clear();
         SortDeckIntoTrips();
     }
+
+    public void RemoveTrip(string card)
+    {
+        _tripsOnDisplay.Remove(card);
+    }
+
+    public void RemoveCardInTopPos(int index)
+    {
+        // TODO: just dispatch event instead of this
+        _topPos[index].GetComponent<Selectable>().Value = 0;
+        _topPos[index].GetComponent<Selectable>().Suit = null;
+    }
+
+    public void ChangeTopPosValue(int index, int value)
+    {
+        _topPos[index].GetComponent<Selectable>().Value = value;
+    }
+
+    public void RemoveCardFromBottom(int index, string cardName)
+    {
+        _bottoms[index].Remove(cardName);
+    }
+
+    public void AddCardToTopPos(int index, int value, string suit)
+    {
+        _topPos[index].GetComponent<Selectable>().Value = value;
+        _topPos[index].GetComponent<Selectable>().Suit = suit;
+    }
 }
