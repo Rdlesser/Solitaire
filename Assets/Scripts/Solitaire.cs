@@ -244,12 +244,13 @@ public class Solitaire : MonoBehaviour
         else
         {
             // Restack top deck
-            RestackTopDeck();
+            ReStackTopDeck();
         }
     }
     
-    private void RestackTopDeck()
+    private void ReStackTopDeck()
     {
+        _deck.Clear();
         foreach (var card in _discardPile)
         {
             _deck.Add(card);
