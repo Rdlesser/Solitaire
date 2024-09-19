@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using UnityEngine;
 
 public class UpdateSprite : MonoBehaviour
@@ -11,24 +9,26 @@ public class UpdateSprite : MonoBehaviour
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Selectable _selectable;
     [SerializeField] private UserInput _userInput;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        var deck = Solitaire.GenerateDeck();
 
-        foreach (var card in deck.Where(card => name == card))
-        {
-            _cardFace = _solitaire.GetCardFace(card);
-            break;
-        }
+    private void Start()
+    {
+        _spriteRenderer.sprite = _selectable.IsFaceUp ? _cardFace : _cardBack;
+        _selectable.OnFaceUpUpdated += HandleFaceUpUpdate;
+    }
+
+    private void OnDestroy()
+    {
+        _selectable.OnFaceUpUpdated -= HandleFaceUpUpdate;
+    }
+
+    private void HandleFaceUpUpdate()
+    {
+        _spriteRenderer.sprite = _selectable.IsFaceUp ? _cardFace : _cardBack;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //todo: shouldn't be here as it is wasteful - make it only update when needed
-        _spriteRenderer.sprite = _selectable.IsFaceUp ? _cardFace : _cardBack;
         
         if (_userInput.GetSlot1())
         {
@@ -37,9 +37,10 @@ public class UpdateSprite : MonoBehaviour
         }
     }
 
-    public void Inject(Solitaire solitaire, UserInput userInput)
+    public void Inject(Solitaire solitaire, UserInput userInput, Sprite cardFace)
     {
         _solitaire = solitaire;
         _userInput = userInput;
+        _cardFace = cardFace;
     }
 }

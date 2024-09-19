@@ -8,6 +8,9 @@ public class Selectable : MonoBehaviour
 {
     [SerializeField] private bool _isTop = false;
     [SerializeField] private int _row;
+    [SerializeField] private bool _isFaceUp;
+
+    public Action OnFaceUpUpdated;
 
     public bool IsTop
     {
@@ -23,11 +26,21 @@ public class Selectable : MonoBehaviour
         get => _row;
         set => _row = value;
     }
-    
-    public bool IsFaceUp { get; set; }
-    public bool IsInDeckPile { get; set; }
 
+    public bool IsFaceUp
+    {
+        get => _isFaceUp;
+        set
+        {
+            
+            _isFaceUp = value;
+            OnFaceUpUpdated?.Invoke();
+        }
+    }
+
+    public bool IsInDeckPile { get; set; }
     private string _valueString;
+
     // Start is called before the first frame update
     void Start()
     {

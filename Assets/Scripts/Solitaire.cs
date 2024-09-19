@@ -129,7 +129,7 @@ public class Solitaire : MonoBehaviour
                     newCard.GetComponent<Selectable>().IsFaceUp = true;
                 }
                 
-                newCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
+                newCard.GetComponent<UpdateSprite>().Inject(this, _userInput, GetCardFace(card));
 
                 yOffset += _cardYOffsetIncrement;
                 zOffset += _cardZOffsetIncrement;
@@ -236,7 +236,7 @@ public class Solitaire : MonoBehaviour
                 var selectable = newTopCard.GetComponent<Selectable>();
                 selectable.IsFaceUp = true;
                 selectable.IsInDeckPile = true;
-                newTopCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
+                newTopCard.GetComponent<UpdateSprite>().Inject(this, _userInput, GetCardFace(card));
             }
 
             _deckLocation++;
