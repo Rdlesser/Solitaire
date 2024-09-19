@@ -1,7 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using DefaultNamespace;
 using Interfaces;
 using UnityEngine;
 
@@ -19,7 +16,7 @@ public class Solitaire : MonoBehaviour, IGameController
     
     private IDeckManager _deckManager;
     private IMoveManager _moveManager;
-    private GameStatistics _statistics;
+    private Statistics _statistics;
     private ITracker _tracker;
     
     private Dictionary<string, Sprite> _cardFaceDictionary = new();
@@ -38,7 +35,7 @@ public class Solitaire : MonoBehaviour, IGameController
         );
         
         _moveManager = new MoveManager();
-        _statistics = new GameStatistics();
+        _statistics = new Statistics();
         _tracker = new SimpleEventTracker();  // Simple tracker implementation for event tracking
         
         // Initialize the UserInput and inject the game controller interface
@@ -53,6 +50,7 @@ public class Solitaire : MonoBehaviour, IGameController
         _deckManager.ShuffleDeck();
         StartCoroutine(_deckManager.DealCards());  // Deal cards using the DeckManager
         _tracker.TrackEvent("GameStarted", new Dictionary<string, string> { { "EventType", "Start" } });
+        _statistics.StartTimer();
     }
     
     // Draws a card from the deck via the DeckManager
@@ -66,6 +64,7 @@ public class Solitaire : MonoBehaviour, IGameController
         }
         
         _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
+        _statistics.IncrementCardsDrawn();
     }
 
     private void CreateCardFaceDictionary()
@@ -131,6 +130,7 @@ public class Solitaire : MonoBehaviour, IGameController
         var parent = selectedCard.transform.parent;
         _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
         _deckManager.MoveCardBottom(selected, target);
+        _statistics.IncrementMoves();
         _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
         
         Debug.Log($"Stacked {selectedCard.name} onto {targetCard.name}");
@@ -144,82 +144,15 @@ public class Solitaire : MonoBehaviour, IGameController
         var parent = selectedCard.transform.parent;
         _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
         _deckManager.MoveCardTop(selected, target);
+        _statistics.IncrementMoves();
         _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
-    }
-    
-    // Determines if the selected card can be moved to the foundation
-    public bool CanMoveToFoundation(GameObject selectedCard)
-    {
-        var selected = selectedCard.GetComponent<Selectable>();
-
-        // Solitaire rule: Only aces can be moved to an empty foundation pile, or cards of the same suit and in sequential order
-        if (selected.Value == 1)  // Ace case
-        {
-            return true;
-        }
-
-        // Check if it can be stacked on the current foundation pile
-        foreach (var topPos in _topPos)
-        {
-            var topCard = topPos.GetComponentInChildren<Selectable>();
-            if (topCard != null && topCard.Suit == selected.Suit && topCard.Value == selected.Value - 1)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
-    // Moves the selected card to the foundation pile
-    public void MoveToFoundation(GameObject selectedCard)
-    {
-        var selected = selectedCard.GetComponent<Selectable>();
-
-        // Find an empty spot or the correct foundation pile
-        foreach (var topPos in _topPos)
-        {
-            var topCard = topPos.GetComponentInChildren<Selectable>();
-
-            // Place the card on an empty foundation pile or stack it on the correct pile
-            if (topCard == null || (topCard.Suit == selected.Suit && topCard.Value == selected.Value - 1))
-            {
-                selectedCard.transform.position = topPos.transform.position;
-                var parent = selectedCard.transform.parent;
-                selectedCard.transform.SetParent(topPos.transform);
-
-                // Record the move in the MoveManager
-                _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
-
-                Debug.Log($"Moved {selectedCard.name} to foundation");
-                return;
-            }
-        }
-    }
-    
-    // Helper methods to extract card value and suit from a card name (e.g., "H2" -> "H", 2)
-    private int GetCardValue(string cardName)
-    {
-        var value = cardName[1..];  // Get the value part of the card (e.g., "2", "10", "J")
-        return value switch
-        {
-            "A" => 1,
-            "J" => 11,
-            "Q" => 12,
-            "K" => 13,
-            _ => int.Parse(value)
-        };
-    }
-
-    private string GetCardSuit(string cardName)
-    {
-        return cardName[..1];  // Get the suit part of the card (e.g., "H" for hearts)
     }
     
     // Undoes the last move
     public void UndoLastMove()
     {
         _moveManager.UndoLastMove();
+        _statistics.IncrementUndos();
         Debug.Log("Undid the last move");
     }
 
