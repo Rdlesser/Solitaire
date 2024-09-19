@@ -132,9 +132,7 @@ public class Solitaire : MonoBehaviour, IGameController
         _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
         _deckManager.MoveCardBottom(selected, target);
         _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
-
-        // Record the move in the MoveManager (for undo purposes)
-
+        
         Debug.Log($"Stacked {selectedCard.name} onto {targetCard.name}");
     }
 
@@ -144,11 +142,9 @@ public class Solitaire : MonoBehaviour, IGameController
         var target = targetCard.GetComponent<Selectable>();
 
         var parent = selectedCard.transform.parent;
+        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
         _deckManager.MoveCardTop(selected, target);
         _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
-        
-        // Record the move in the MoveManager (for undo purposes)
-        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
     }
     
     // Determines if the selected card can be moved to the foundation
