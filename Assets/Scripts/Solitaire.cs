@@ -1,20 +1,22 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
+using Interfaces;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Solitaire : MonoBehaviour
 {
-
     [SerializeField] private Sprite[] _cardFaces;
     [SerializeField] private GameObject _cardPrefab;
     [SerializeField] private GameObject _deckButton;
     [SerializeField] private GameObject[] _bottomPos;
     [SerializeField] private GameObject[] _topPos;
     [SerializeField] private UserInput _userInput;
+    
+    private Statistics _statistics;
+    private MoveManager _moveManager;
+    private ITracker _tracker;
     
     private float _cardInitialYOffset = 0f;
     private float _cardYOffsetIncrement = 0.3f;
@@ -55,8 +57,12 @@ public class Solitaire : MonoBehaviour
 
     void Start()
     {
-        _bottoms = new List<string>[] { _bottom0, _bottom1, _bottom2, _bottom3, _bottom4, _bottom5, _bottom6 };
+        _statistics = new Statistics();
+        _moveManager = new MoveManager();
+        _tracker = new SimpleEventTracker();  // Can replace this with a more complex tracker
+        _bottoms = new[] { _bottom0, _bottom1, _bottom2, _bottom3, _bottom4, _bottom5, _bottom6 };
         PlayCards();
+        _tracker.TrackEvent("GameStarted", new Dictionary<string, string> { { "EventType", "Start" } });
     }
 
     // Update is called once per frame
@@ -306,5 +312,11 @@ public class Solitaire : MonoBehaviour
     public GameObject GetTopPos(int index)
     {
         return _topPos[index];
+    }
+    
+    public void UndoLastMove()
+    {
+        _moveManager.UndoLastMove();
+        _tracker.TrackEvent("UndoMove", new Dictionary<string, string> { { "EventType", "Undo" } });
     }
 }
