@@ -1,322 +1,186 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using DefaultNamespace;
 using Interfaces;
 using UnityEngine;
 
-public class Solitaire : MonoBehaviour
+public class Solitaire : MonoBehaviour, IGameController
 {
     [SerializeField] private Sprite[] _cardFaces;
+    [SerializeField] private Sprite _cardBackSprite;
     [SerializeField] private GameObject _cardPrefab;
     [SerializeField] private GameObject _deckButton;
     [SerializeField] private GameObject[] _bottomPos;
     [SerializeField] private GameObject[] _topPos;
+    [SerializeField] private Transform _deckPosition;
+    [SerializeField] private Transform _drawnCardsPosition;
     [SerializeField] private UserInput _userInput;
     
+    private IDeckManager _deckManager;
+    private IMoveManager _moveManager;
     private Statistics _statistics;
-    private MoveManager _moveManager;
     private ITracker _tracker;
     
-    private float _cardInitialYOffset = 0f;
-    private float _cardYOffsetIncrement = 0.3f;
-    private float _cardInitialZOffset = 0.03f;
-    private float _cardZOffsetIncrement = 0.03f;
-    
-    public static string[] Suits = new string[] { "C", "D", "H", "S" };
-    public static string[] Values = new[] { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-    
-    private List<string>[] _bottoms;
-    private List<string>[] _tops;
-    private List<string> _tripsOnDisplay = new();
-    private List<List<string>> _deckTrips = new();
-
-    private List<string> _bottom0 = new();
-    private List<string> _bottom1 = new();
-    private List<string> _bottom2 = new();
-    private List<string> _bottom3 = new();
-    private List<string> _bottom4 = new();
-    private List<string> _bottom5 = new();
-    private List<string> _bottom6 = new();
-
-    public List<string> _deck;
-    public List<string> _discardPile = new();
-
-    private int _deckLocation;
-    private int _trips;
-    private int _tripsRemainder;
-
     private Dictionary<string, Sprite> _cardFaceDictionary = new();
 
     private void OnEnable()
     {
         CreateCardFaceDictionary();
+
+        _deckManager = new DeckManager(bottomPos: _bottomPos,
+            topPos: _topPos,
+            cardPrefab: _cardPrefab,
+            deckPosition: _deckPosition,
+            drawnCardsPosition: _drawnCardsPosition,
+            cardFaceDictionary: _cardFaceDictionary,
+            cardBackSprite: _cardBackSprite
+        );
+        
+        _moveManager = new MoveManager();
+        _statistics = new Statistics();
+        _tracker = new SimpleEventTracker();  // Simple tracker implementation for event tracking
+        
+        // Initialize the UserInput and inject the game controller interface
+        _userInput.Initialize(this);  // Pass `this` because Solitaire implements IGameController
     }
 
     // Start is called before the first frame update
-
     void Start()
     {
-        _statistics = new Statistics();
-        _moveManager = new MoveManager();
-        _tracker = new SimpleEventTracker();  // Can replace this with a more complex tracker
-        _bottoms = new[] { _bottom0, _bottom1, _bottom2, _bottom3, _bottom4, _bottom5, _bottom6 };
-        PlayCards();
+        // Generate and shuffle the deck, then deal the cards
+        _deckManager.GenerateDeck();
+        _deckManager.ShuffleDeck();
+        StartCoroutine(_deckManager.DealCards());  // Deal cards using the DeckManager
         _tracker.TrackEvent("GameStarted", new Dictionary<string, string> { { "EventType", "Start" } });
+        _statistics.StartTimer();
     }
-
-    // Update is called once per frame
-
-    void Update()
+    
+    // Draws a card from the deck via the DeckManager
+    public void DrawCard()
     {
+        var card = _deckManager.DrawCard(_moveManager);
+
+        if (card == null)
+        {
+            return;
+        }
         
+        _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
+        _statistics.IncrementCardsDrawn();
     }
 
     private void CreateCardFaceDictionary()
     {
         foreach (var cardFace in _cardFaces)
         {
-            _cardFaceDictionary[cardFace.name] = cardFace;
-        }
-    }
-
-    public void PlayCards()
-    {
-        _deck = GenerateDeck();
-        _deck.Shuffle();
-        
-        //test the cards in the deck:
-        foreach (var card in _deck)
-        {
-            Debug.Log(card);
-        }
-        
-        SolitaireSort();
-        StartCoroutine(SolitaireDeal());
-        SortDeckIntoTrips();
-    }
-
-    public static List<string> GenerateDeck()
-    {
-        List<string> newDeck = new List<string>();
-
-        foreach (var suit in Suits)
-        {
-            foreach (var value in Values)
+            if (cardFace.name == "CardBack")
             {
-                newDeck.Add(suit + value);
+                _cardBackSprite = cardFace;  // Assign the card back sprite
             }
-        }
-
-        return newDeck;
-    }
-    
-    public Sprite GetCardFace(string cardName)
-    {
-        return _cardFaceDictionary.GetValueOrDefault(cardName);
-    }
-
-    private IEnumerator SolitaireDeal()
-    {
-        for (int i = 0; i < 7; i++)
-        {
-            var yOffset = _cardInitialYOffset;
-            var zOffset = _cardInitialZOffset;
-        
-            foreach (var card in _bottoms[i])
+            else
             {
-                yield return new WaitForSeconds(0.01f);
-                var newCard = Instantiate(_cardPrefab, new Vector3(_bottomPos[i].transform.position.x, _bottomPos[i].transform.position.y - yOffset, _bottomPos[i].transform.position.z - zOffset), Quaternion.identity, _bottomPos[i].transform);
-                newCard.name = card;
-                newCard.GetComponent<Selectable>().Row = i;
-
-                if (card == _bottoms[i][_bottoms[i].Count - 1])
-                {
-                    newCard.GetComponent<Selectable>().IsFaceUp = true;
-                }
-                
-                newCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
-
-                yOffset += _cardYOffsetIncrement;
-                zOffset += _cardZOffsetIncrement;
-                _discardPile.Add(card);
-            }
-        }
-
-        foreach (var card in _discardPile)
-        {
-            if (_deck.Contains(card))
-            {
-                _deck.Remove(card);
+                _cardFaceDictionary[cardFace.name] = cardFace;  // Add card face to the dictionary
             }
         }
         
-        _discardPile.Clear();
-    }
-
-    private void SolitaireSort()
-    {
-        for (int i = 0; i < 7; i++)
+        // Log an error if no card back sprite is found
+        if (_cardBackSprite == null)
         {
-            for (int j = i; j < 7; j++)
-            {
-                _bottoms[j].Add(_deck.Last());
-                _deck.RemoveAt(_deck.Count - 1);
-            }
-        }
-    }
-
-    public void SortDeckIntoTrips()
-    {
-        _trips = _deck.Count / 3;
-        _tripsRemainder = _deck.Count % 3;
-        _deckTrips.Clear();
-
-        var modifier = 0;
-
-        for (int i = 0; i < _trips; i++)
-        {
-            var myTrips = new List<string>();
-
-            for (int j = 0; j < 3; j++)
-            {
-                myTrips.Add(_deck[j + modifier]);
-            }
-            
-            _deckTrips.Add(myTrips);
-            modifier += 3;
-        }
-
-        if (_tripsRemainder != 0)
-        {
-            var myRemainders = new List<string>();
-            modifier = 0;
-
-            for (int k = 0; k < _tripsRemainder; k++)
-            {
-                myRemainders.Add(_deck[_deck.Count - _tripsRemainder + modifier]);
-                modifier++;
-            }
-
-            _deckTrips.Add(myRemainders);
-            _trips++;
-        }
-
-        _deckLocation = 0;
-    }
-
-    public void DealFromDeck()
-    {
-        // Add remaining cards to discard pile 
-        foreach (Transform child in _deckButton.transform)
-        {
-            if (!child.CompareTag(Tags.CARD))
-            {
-                continue;
-            }
-            _deck.Remove(child.name);
-            _discardPile.Add(child.name);
-            Destroy(child.gameObject);
-        }
-        
-        if (_deckLocation < _trips)
-        {
-            // draw 3 new cards
-            _tripsOnDisplay.Clear();
-            var xOffset = 2.5f;
-            var zOffset = -0.2f;
-
-            foreach (var card in _deckTrips[_deckLocation])
-            {
-                var newTopCard = Instantiate(_cardPrefab,
-                    new Vector3(_deckButton.transform.position.x + xOffset,
-                        _deckButton.transform.position.y,
-                        _deckButton.transform.position.z + zOffset),
-                    Quaternion.identity,
-                    _deckButton.transform);
-
-                xOffset += 0.5f;
-                zOffset -= 0.2f;
-                newTopCard.name = card;
-                _tripsOnDisplay.Add(card);
-                var selectable = newTopCard.GetComponent<Selectable>();
-                selectable.IsFaceUp = true;
-                selectable.IsInDeckPile = true;
-                newTopCard.GetComponent<UpdateSprite>().Inject(this, _userInput);
-            }
-
-            _deckLocation++;
-        }
-        else
-        {
-            // Restack top deck
-            ReStackTopDeck();
+            Debug.LogError("Card back sprite could not be found");
         }
     }
     
-    private void ReStackTopDeck()
+    public bool CanStackBottom(GameObject selectedCard, GameObject targetCard)
     {
-        _deck.Clear();
-        foreach (var card in _discardPile)
+        if (selectedCard.transform.parent == targetCard.transform)
         {
-            _deck.Add(card);
+            return false;
         }
         
-        _discardPile.Clear();
-        SortDeckIntoTrips();
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
+
+        // Solitaire rule: Cards can only be stacked if they have alternating colors and consecutive ranks
+        var isDifferentColor = selected.Suit is "C" or "S" && target.Suit is "H" or "D" or null || selected.Suit is "H" or "D" && target.Suit is "C" or "S" or null;
+        var isNextRank = selected.Value == target.Value - 1 || selected.Value == 13 && target.Value == 0;
+
+        return isDifferentColor && isNextRank;
     }
 
-    public void RemoveTrip(string card)
+    public bool CanStackTop(GameObject selectedCard, GameObject targetCard)
     {
-        _tripsOnDisplay.Remove(card);
-    }
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
 
-    public void RemoveCardInTopPos(int index)
-    {
-        // TODO: just dispatch event instead of this
-        _topPos[index].GetComponent<Selectable>().Value = 0;
-        _topPos[index].GetComponent<Selectable>().Suit = null;
-    }
+        if (selected.Value == 1 && target.Value == 0)
+        {
+            return true;
+        }
 
-    public void ChangeTopPosValue(int index, int value)
-    {
-        _topPos[index].GetComponent<Selectable>().Value = value;
-    }
+        var isSameSuit = selected.Suit == target.Suit;
+        var isNextRank = selected.Value == target.Value + 1;
 
-    public void RemoveCardFromBottom(int index, string cardName)
-    {
-        _bottoms[index].Remove(cardName);
-    }
-
-    public void AddCardToTopPos(int index, int value, string suit)
-    {
-        _topPos[index].GetComponent<Selectable>().Value = value;
-        _topPos[index].GetComponent<Selectable>().Suit = suit;
-    }
-
-    public bool IsLastCardInDraw(string cardName)
-    {
-        return _tripsOnDisplay.Last() == cardName;
-    }
-
-    public bool IsCardBlocked(string cardName, int cardRow)
-    {
-        return _bottoms[cardRow].Last() == cardName;
-    }
-
-    public int GetTopPosCount()
-    {
-        return _topPos.Length;
-    }
-
-    public GameObject GetTopPos(int index)
-    {
-        return _topPos[index];
+        return isSameSuit && isNextRank;
     }
     
+    // Stacks the selected card onto the target card (in the tableau)
+    public void StackCardsInBottom(GameObject selectedCard, GameObject targetCard)
+    {
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
+       
+        var parent = selectedCard.transform.parent;
+        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
+        _deckManager.MoveCardBottom(selected, target);
+        _statistics.IncrementMoves();
+        _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
+        
+        Debug.Log($"Stacked {selectedCard.name} onto {targetCard.name}");
+    }
+
+    public void StackCardsInTop(GameObject selectedCard, GameObject targetCard)
+    {
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
+
+        var parent = selectedCard.transform.parent;
+        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
+        _deckManager.MoveCardTop(selected, target);
+        _statistics.IncrementMoves();
+        _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
+    }
+    
+    // Undoes the last move
     public void UndoLastMove()
     {
         _moveManager.UndoLastMove();
-        _tracker.TrackEvent("UndoMove", new Dictionary<string, string> { { "EventType", "Undo" } });
+        _statistics.IncrementUndos();
+        Debug.Log("Undid the last move");
+    }
+
+    public bool TryFlip(GameObject selected)
+    {
+        // if the card clicked on is not blocked}
+        if (IsBlocked(selected))
+        {
+            return false;
+        }
+
+        // flip it over
+        var selectable = selected.GetComponent<Selectable>();
+        selectable.FlipCard(true);
+        _moveManager.RecordMove(new FlipMove(selectable));
+
+        return true;
+
+    }
+    
+    private bool IsBlocked(GameObject selectedCard)
+    {
+        var selectable = selectedCard.GetComponent<Selectable>();
+        return IsCardBlocked(selectable.name, selectable.Row);
+    }
+
+    private bool IsCardBlocked(string cardName, int cardRow)
+    {
+        return _deckManager.IsCardBlocked(cardName, cardRow);
     }
 }
