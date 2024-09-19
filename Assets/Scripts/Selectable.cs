@@ -12,7 +12,8 @@ public class Selectable : MonoBehaviour
     public int Value { get; private set; }
     public string Suit { get; private set; }
     public bool IsFaceUp { get; private set; }
-    public bool IsInDeckPile { get; private set; }
+    public bool IsInDeckPile { get;
+        set; }
     public bool IsTop
     {
         get => _isTop;

@@ -86,25 +86,46 @@ public class Solitaire : MonoBehaviour, IGameController
         }
     }
     
-    public bool CanStack(GameObject selectedCard, GameObject targetCard)
+    public bool CanStackBottom(GameObject selectedCard, GameObject targetCard)
     {
+        if (selectedCard.transform.parent == targetCard.transform)
+        {
+            return false;
+        }
+        
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
 
         // Solitaire rule: Cards can only be stacked if they have alternating colors and consecutive ranks
-        var isDifferentColor = selected.Suit is "C" or "S" && target.Suit is "H" or "D" || selected.Suit is "H" or "D" && target.Suit is "C" or "S";
-        var isNextRank = selected.Value == target.Value - 1;
+        var isDifferentColor = selected.Suit is "C" or "S" && target.Suit is "H" or "D" or null || selected.Suit is "H" or "D" && target.Suit is "C" or "S" or null;
+        var isNextRank = selected.Value == target.Value - 1 || selected.Value == 13 && target.Value == 0;
 
         return isDifferentColor && isNextRank;
     }
-    
-    // Stacks the selected card onto the target card (in the tableau)
-    public void StackCards(GameObject selectedCard, GameObject targetCard)
+
+    public bool CanStackTop(GameObject selectedCard, GameObject targetCard)
     {
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
 
-        _deckManager.MoveCard(selected, target.Row);
+        if (selected.Value == 1 && target.Value == 0)
+        {
+            return true;
+        }
+
+        var isSameSuit = selected.Suit == target.Suit;
+        var isNextRank = selected.Value == target.Value + 1;
+
+        return isSameSuit && isNextRank;
+    }
+    
+    // Stacks the selected card onto the target card (in the tableau)
+    public void StackCardsInBottom(GameObject selectedCard, GameObject targetCard)
+    {
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
+
+        _deckManager.MoveCardBottom(selected, target.Row);
         _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
         
         selected.SetRow(target.Row);
@@ -115,12 +136,31 @@ public class Solitaire : MonoBehaviour, IGameController
             yOffset = 0;
         }
         selectedCard.transform.position = new Vector3(targetCard.transform.position.x, targetCard.transform.position.y - yOffset, targetCard.transform.position.z - 0.1f);
+        var parent = selectedCard.transform.parent;
         selectedCard.transform.SetParent(targetCard.transform);  // Make the selected card a child of the target card
 
         // Record the move in the MoveManager (for undo purposes)
-        _moveManager.RecordMove(new CardMove(selectedCard, targetCard));
+        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
 
         Debug.Log($"Stacked {selectedCard.name} onto {targetCard.name}");
+    }
+
+    public void StackCardsInTop(GameObject selectedCard, GameObject targetCard)
+    {
+        var selected = selectedCard.GetComponent<Selectable>();
+        var target = targetCard.GetComponent<Selectable>();
+
+        _deckManager.MoveCardTop(selected, target.Row);
+        _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
+        selected.SetRow(target.Row);
+        selected.IsTop = true;
+        
+        selectedCard.transform.position = new Vector3(targetCard.transform.position.x, targetCard.transform.position.y, targetCard.transform.position.z - 0.1f);
+        var parent = selectedCard.transform.parent;
+        selectedCard.transform.SetParent(targetCard.transform);  // Make the selected card a child of the target card
+        
+        // Record the move in the MoveManager (for undo purposes)
+        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
     }
     
     // Determines if the selected card can be moved to the foundation
@@ -161,10 +201,11 @@ public class Solitaire : MonoBehaviour, IGameController
             if (topCard == null || (topCard.Suit == selected.Suit && topCard.Value == selected.Value - 1))
             {
                 selectedCard.transform.position = topPos.transform.position;
+                var parent = selectedCard.transform.parent;
                 selectedCard.transform.SetParent(topPos.transform);
 
                 // Record the move in the MoveManager
-                _moveManager.RecordMove(new CardMove(selectedCard, topPos));
+                _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
 
                 Debug.Log($"Moved {selectedCard.name} to foundation");
                 return;

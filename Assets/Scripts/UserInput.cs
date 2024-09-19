@@ -44,6 +44,10 @@ public class UserInput : MonoBehaviour
                 {
                     HandleBottomClick(hit.collider.gameObject);
                 }
+                else if (hit.collider.CompareTag(Tags.TOP))
+                {
+                    HandleTopClick(hit.collider.gameObject);
+                }
             }
         }
 
@@ -78,7 +82,7 @@ public class UserInput : MonoBehaviour
         var selectable = card.GetComponent<Selectable>();
 
         // Check if the card is on the tableau (bottom) facing up
-        if (!selectable.IsInDeckPile && selectable.IsFaceUp)
+        if (!selectable.IsInDeckPile && !selectable.IsTop && selectable.IsFaceUp)
         {
             if (_selectedCard == null)
             {
@@ -93,10 +97,10 @@ public class UserInput : MonoBehaviour
             else
             {
                 // Attempt to stack the selected card on the tableau or foundation
-                if (_gameController.CanStack(_selectedCard, card))
+                if (_gameController.CanStackBottom(_selectedCard, card))
                 {
                     // Move the card
-                    _gameController.StackCards(_selectedCard, card);
+                    _gameController.StackCardsInBottom(_selectedCard, card);
                     DeselectCard();  // After a successful move, deselect
                 }
                 else
@@ -131,10 +135,10 @@ public class UserInput : MonoBehaviour
             if (_selectedCard != null)
             {
                 // Check if you can move the selected card to the foundation
-                if (_gameController.CanMoveToFoundation(_selectedCard))
+                if (_gameController.CanStackTop(_selectedCard, card))
                 {
                     // Move card to foundation
-                    _gameController.MoveToFoundation(_selectedCard);
+                    _gameController.StackCardsInTop(_selectedCard, card);
                     DeselectCard();  // After a successful move, deselect
                 }
             }
@@ -156,13 +160,34 @@ public class UserInput : MonoBehaviour
         }
 
         // Attempt to stack the selected card on the tableau or foundation
-        if (!_gameController.CanStack(_selectedCard, selected))
+        if (!_gameController.CanStackBottom(_selectedCard, selected))
         {
             return;
         }
 
         // Move the card
-        _gameController.StackCards(_selectedCard, selected);
+        _gameController.StackCardsInBottom(_selectedCard, selected);
+        DeselectCard();  // After a successful move, deselect
+    }
+    
+    private void HandleTopClick(GameObject selectedCard)
+    {
+        Debug.Log("Top Clicked");
+        
+        if (_selectedCard == null || !_selectedCard.CompareTag(Tags.CARD))
+        {
+            return;
+        }
+
+        var selected = selectedCard.GetComponent<Selectable>();
+
+        if (!_gameController.CanStackTop(_selectedCard, selectedCard))
+        {
+            return;
+        }
+        
+        // Move the card
+        _gameController.StackCardsInTop(_selectedCard, selectedCard);
         DeselectCard();  // After a successful move, deselect
     }
     

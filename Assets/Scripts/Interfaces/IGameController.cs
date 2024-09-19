@@ -4,8 +4,10 @@ namespace Interfaces
 {
     public interface IGameController
     {
-        bool CanStack(GameObject selectedCard, GameObject targetCard);
-        void StackCards(GameObject selectedCard, GameObject targetCard);
+        bool CanStackBottom(GameObject selectedCard, GameObject targetCard);
+        bool CanStackTop(GameObject selectedCard, GameObject targetCard);
+        void StackCardsInBottom(GameObject selectedCard, GameObject targetCard);
+        void StackCardsInTop(GameObject selectedCard, GameObject targetCard);
         bool CanMoveToFoundation(GameObject selectedCard);
         void MoveToFoundation(GameObject selectedCard);
         void DrawCard();

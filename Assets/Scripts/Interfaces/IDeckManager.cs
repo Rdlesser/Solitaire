@@ -13,7 +13,8 @@ namespace Interfaces
         GameObject DrawCard();
         List<string> GetDiscardPile();
         bool IsCardBlocked(string cardName, int cardRow);
-        void MoveCard(Selectable selected, int targetRow);
+        void MoveCardBottom(Selectable selected, int targetRow);
+        void MoveCardTop(Selectable selected, int targetRow);
     }
 
 }

@@ -12,6 +12,7 @@ public class DeckManager : IDeckManager
     
     private List<string> _deck = new();  // Cards in the deck
     private List<string> _discardPile = new();  // Discarded cards
+    private List<Selectable> _drawnCards = new();
     
     private GameObject[] _bottomPos;  // Reference to the bottom positions (e.g. Tableau piles in Solitaire)
     private GameObject[] _topPos;     // Reference to the top positions (e.g. Foundation piles in Solitaire)
@@ -84,12 +85,28 @@ public class DeckManager : IDeckManager
             // Move the card to the discard pile and flip it face-up
             newCard.transform.position = new Vector3(_drawnCardsPosition.position.x, _drawnCardsPosition.position.y, _drawnCardsPosition.position.z + _discardPile.Count * -0.02f);
             _discardPile.Add(cardName);
-            newCard.GetComponent<Selectable>().FlipCard(true);
+            selectable.FlipCard(true);
 
+            _drawnCards.Add(selectable);
             return newCard;
         }
         else
         {
+            // Reset the deck
+            _deck = _discardPile;
+            // Destroy all instantiated objects in discard pile that have not been placed
+            foreach (var card in _drawnCards)
+            {
+                if (card.IsInDeckPile)
+                {
+                    card.gameObject.SetActive(false);
+                    Object.Destroy(card);
+                }
+            }
+            
+            // clear drawn cards
+            _drawnCards.Clear();
+            _discardPile.Clear();
             Debug.Log("No more cards in the deck to draw.");
             return null;
         }
@@ -164,12 +181,25 @@ public class DeckManager : IDeckManager
         return _bottoms[cardRow].Last() == cardName;
     }
 
-    public void MoveCard(Selectable selected, int targetRow)
+    public void MoveCardBottom(Selectable selected, int targetRow)
     {
         if (selected.IsInDeckPile)
         {
+            selected.IsInDeckPile = false;
+            _discardPile.Remove(selected.name);
             return;
         }
+        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+    }
+
+    public void MoveCardTop(Selectable selected, int targetRow)
+    {
+        if (selected.IsInDeckPile)
+        {
+            selected.IsInDeckPile = false;
+            return;
+        }
+
         _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
     }
 }
