@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Interfaces
 {
 
     public interface IDeckManager
     {
-        List<string> GenerateDeck();
+        void GenerateDeck();
         void ShuffleDeck();
-        void DealCards();
+        IEnumerator DealCards();
+        GameObject DrawCard();
+        List<string> GetDiscardPile();
+        bool IsCardBlocked(string cardName, int cardRow);
+        void MoveCard(Selectable selected, int targetRow);
     }
 
 }

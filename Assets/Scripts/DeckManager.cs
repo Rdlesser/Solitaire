@@ -1,0 +1,175 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using DefaultNamespace;
+using Interfaces;
+using UnityEngine;
+
+public class DeckManager : IDeckManager
+{
+    private static readonly string[] Suits = { "C", "D", "H", "S" };
+    private static readonly string[] Values = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
+    
+    private List<string> _deck = new();  // Cards in the deck
+    private List<string> _discardPile = new();  // Discarded cards
+    
+    private GameObject[] _bottomPos;  // Reference to the bottom positions (e.g. Tableau piles in Solitaire)
+    private GameObject[] _topPos;     // Reference to the top positions (e.g. Foundation piles in Solitaire)
+    private GameObject _cardPrefab;   // The prefab used to instantiate a card in the scene
+    private Transform _deckPosition;  // Reference to the deck's position on the board
+    private Transform _drawnCardsPosition;
+    
+    private List<string>[] _bottoms;  // List to store cards in the bottom (tableau) piles
+    
+    private Dictionary<string, Sprite> _cardFaceDictionary;
+    private Sprite _cardBackSprite;
+    
+    public DeckManager(GameObject[] bottomPos, GameObject[] topPos, GameObject cardPrefab, Transform deckPosition, Transform drawnCardsPosition, Dictionary<string, Sprite> cardFaceDictionary, Sprite cardBackSprite)
+    {
+        _bottomPos = bottomPos;
+        _topPos = topPos;
+        _cardPrefab = cardPrefab;
+        _deckPosition = deckPosition;
+        _drawnCardsPosition = drawnCardsPosition;
+        _cardFaceDictionary = cardFaceDictionary;
+        _cardBackSprite = cardBackSprite;
+    }
+    
+    public void GenerateDeck()
+    {
+        _deck.Clear();  // Ensure the deck is empty before filling it
+        foreach (string suit in Suits)
+        {
+            foreach (var value in Values)
+            {
+                // Create a card name (e.g., "C2" for 2 of clubs)
+                var cardName = suit + value;
+
+                // // Instantiate the card prefab and set its properties
+                // var newCard = Object.Instantiate(_cardPrefab, _deckPosition.position, Quaternion.identity);
+                // newCard.name = cardName;
+
+                // Initialize the card's Selectable component with its value and suit
+                // var selectable = newCard.GetComponent<Selectable>();
+                // selectable.Initialize(GetCardValue(value), suit, false, true, _cardFaceDictionary, _cardBackSprite);
+
+                // Add the card to the deck
+                _deck.Add(cardName);
+            }
+        }
+
+        Debug.Log($"Generated deck with {_deck.Count} cards.");
+    }
+    
+    public void ShuffleDeck()
+    {
+        _deck.Shuffle();    
+    }
+    
+    // Draws a card from the deck
+    public GameObject DrawCard()
+    {
+        if (_deck.Count > 0)
+        {
+            var cardName = _deck[0];  // Get the top card from the deck
+            _deck.RemoveAt(0);  // Remove it from the deck
+            // Instantiate the card prefab and set its properties
+            var newCard = Object.Instantiate(_cardPrefab, _drawnCardsPosition.position, Quaternion.identity, _drawnCardsPosition);
+            newCard.name = cardName;
+
+            // Initialize the card's Selectable component with its value and suit
+            var selectable = newCard.GetComponent<Selectable>();
+            selectable.Initialize(GetCardValue(cardName), GetCardSuit(cardName), false, true, _cardFaceDictionary, _cardBackSprite);
+
+            // Move the card to the discard pile and flip it face-up
+            newCard.transform.position = new Vector3(_drawnCardsPosition.position.x, _drawnCardsPosition.position.y, _drawnCardsPosition.position.z + _discardPile.Count * -0.02f);
+            _discardPile.Add(cardName);
+            newCard.GetComponent<Selectable>().FlipCard(true);
+
+            return newCard;
+        }
+        else
+        {
+            Debug.Log("No more cards in the deck to draw.");
+            return null;
+        }
+    }
+
+    public List<string> GetDiscardPile()
+    {
+        return _discardPile;
+    }
+
+    public IEnumerator DealCards()
+    {
+        _bottoms = new List<string>[_bottomPos.Length];
+
+        // Distribute cards to the tableau piles (bottom positions)
+        for (int i = 0; i < _bottomPos.Length; i++)
+        {
+            _bottoms[i] = new List<string>();
+            for (int j = 0; j <= i; j++)  // Increasing number of cards for each column
+            {
+                var card = _deck[0];
+                _deck.RemoveAt(0);
+
+                // Add card to the current tableau pile
+                _bottoms[i].Add(card);
+
+                // Instantiate the card in the scene
+                GameObject newCard = Object.Instantiate(_cardPrefab, _deckPosition.position, Quaternion.identity, _bottomPos[i].transform);
+                newCard.name = card;
+                newCard.transform.position = _bottomPos[i].transform.position + new Vector3(0, -j * 0.3f, -j * 0.1f -0.1F);  // Stagger the cards visually
+                var selectable = newCard.GetComponent<Selectable>();
+                var isFaceUp = j == i;
+                
+                selectable.Initialize(
+                    value: GetCardValue(card),
+                    suit: GetCardSuit(card),
+                    isFaceUp: isFaceUp,
+                    isInDeckPile: false,
+                    cardFaceDictionary: _cardFaceDictionary,
+                    cardBackSprite: _cardBackSprite
+                );
+                
+                selectable.SetRow(i);
+
+                yield return new WaitForSeconds(0.02f);
+            }
+        }
+
+        // The remaining cards stay in the deck for future draws
+    }
+    
+    private int GetCardValue(string card)
+    {
+        var value = card[1..];  // Get value part of the string (e.g., "A", "2", "J")
+        return value switch
+        {
+            "A" => 1,
+            "J" => 11,
+            "Q" => 12,
+            "K" => 13,
+            _ => int.Parse(value)  // Parse numeric values
+        };
+    }
+    
+    private string GetCardSuit(string card)
+    {
+        return card[..1];  // Get suit part of the string (e.g., "C" for clubs)
+    }
+    
+    public bool IsCardBlocked(string cardName, int cardRow)
+    {
+        return _bottoms[cardRow].Last() == cardName;
+    }
+
+    public void MoveCard(Selectable selected, int targetRow)
+    {
+        if (selected.IsInDeckPile)
+        {
+            return;
+        }
+        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+    }
+}

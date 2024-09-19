@@ -5,7 +5,11 @@ public class MoveManager
 {
     private Stack<Move> _moves = new();
 
-    public void RecordMove(Move move) { _moves.Push(move); }
+    public void RecordMove(Move move)
+    {
+        _moves.Push(move);
+    }
+
     public void UndoLastMove()
     {
         if (_moves.Count <= 0)
@@ -13,7 +17,7 @@ public class MoveManager
             return;
         }
 
-        var lastMove = _moves.Pop();
+        Move lastMove = _moves.Pop();
         lastMove.Undo();
     }
 }

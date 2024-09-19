@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4753603062238816423}
   - component: {fileID: 2012298358451865407}
-  - component: {fileID: 422820593837639707}
   - component: {fileID: 8107075586509137562}
   - component: {fileID: 5387901429739901072}
   - component: {fileID: 3137489224995327475}
@@ -88,23 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &422820593837639707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8005825552161870121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f7d39b9af1c9f248b25f915fc5cc102, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cardFace: {fileID: 0}
-  _cardBack: {fileID: 21300000, guid: fa045cd8f96ddbf4ca0443284f64e6bd, type: 3}
-  _solitaire: {fileID: 0}
-  _spriteRenderer: {fileID: 2012298358451865407}
-  _selectable: {fileID: 8107075586509137562}
 --- !u!114 &8107075586509137562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d9b13c72f2317489f50504e256ab55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isFaceUp: 0
+  _spriteRenderer: {fileID: 2012298358451865407}
 --- !u!50 &5387901429739901072
 Rigidbody2D:
   serializedVersion: 4

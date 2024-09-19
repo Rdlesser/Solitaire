@@ -295,6 +295,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 4
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &163322216
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,6 +469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 1
   _row: 1
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &247671710
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +484,7 @@ GameObject:
   - component: {fileID: 247671714}
   - component: {fileID: 247671715}
   m_Layer: 0
-  m_Name: SplitaireGame
+  m_Name: SolitaireGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -515,8 +517,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1604945b525ab9c43b6acee1f4c69746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _slot1: {fileID: 0}
-  _solitaire: {fileID: 247671713}
 --- !u!114 &247671713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -582,6 +582,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e2461662ac3b9ea428f8507e43840c1c, type: 3}
   - {fileID: 21300000, guid: 15b41b0f3c8efff44985ad86eb9727ad, type: 3}
   - {fileID: 21300000, guid: d41115a889446584c858fbf9d6201449, type: 3}
+  _cardBackSprite: {fileID: 21300000, guid: fa045cd8f96ddbf4ca0443284f64e6bd, type: 3}
   _cardPrefab: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
   _deckButton: {fileID: 351256843}
   _bottomPos:
@@ -597,9 +598,9 @@ MonoBehaviour:
   - {fileID: 163322216}
   - {fileID: 636744717}
   - {fileID: 1809572941}
+  _deckPosition: {fileID: 351256844}
+  _drawnCardsPosition: {fileID: 1970059870}
   _userInput: {fileID: 247671712}
-  _deck: []
-  _discardPile: []
 --- !u!114 &247671714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -803,6 +804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 5
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &351256843
 GameObject:
   m_ObjectHideFlags: 0
@@ -1169,6 +1171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 3
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1567,6 +1570,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 1
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &636744717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1740,6 +1744,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 1
   _row: 2
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &646751374
 GameObject:
   m_ObjectHideFlags: 0
@@ -1770,6 +1775,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 351256844}
+  - {fileID: 1970059870}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &835308148
@@ -2185,6 +2191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 2
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &1216567265
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,6 +2872,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 1
   _row: 0
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &1789066106
 GameObject:
   m_ObjectHideFlags: 0
@@ -3038,6 +3046,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 6
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &1809572941
 GameObject:
   m_ObjectHideFlags: 0
@@ -3211,6 +3220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 1
   _row: 3
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &1944952386
 GameObject:
   m_ObjectHideFlags: 0
@@ -3288,6 +3298,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1944952386}
   m_CullTransparentMesh: 1
+--- !u!1 &1970059869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1970059870}
+  m_Layer: 0
+  m_Name: DrawnCardsPosition
+  m_TagString: Deck
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1970059870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970059869}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.6, y: 2.88, z: 0}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 646751375}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1992329131
 GameObject:
   m_ObjectHideFlags: 0
@@ -3461,71 +3502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTop: 0
   _row: 0
---- !u!1001 &928015506629958206
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 422820593837639707, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: _solitaire
-      value: 
-      objectReference: {fileID: 247671713}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -14.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.39
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4753603062238816423, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_Name
-      value: Card
-      objectReference: {fileID: 0}
-    - target: {fileID: 8005825552161870121, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d00d2e989ebdea243896badd266c00d4, type: 3}
+  _spriteRenderer: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3534,7 +3511,6 @@ SceneRoots:
   - {fileID: 646751375}
   - {fileID: 454857347}
   - {fileID: 835308149}
-  - {fileID: 928015506629958206}
   - {fileID: 247671711}
   - {fileID: 1216567269}
   - {fileID: 916833444}
