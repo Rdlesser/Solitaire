@@ -4,18 +4,25 @@ using UnityEngine;
 
 public class DrawMove : Move
 {
-    private string _card;
+    private Selectable _card;
+    private List<Selectable> _drawnCards;
     private List<string> _discardPile;
+    private List<string> _deck;
 
-    public DrawMove(GameObject card, List<string> discardPile)
+    public DrawMove(Selectable card, List<Selectable> drawnCards, List<string> discardPile, List<string> deck)
     {
-        _card = card.name;
+        _card = card;
+        _drawnCards = drawnCards;
         _discardPile = discardPile;
+        _deck = deck;
     }
 
     public override void Undo()
     {
-        _discardPile.Remove(_card);
+        _drawnCards.Remove(_card);
+        _discardPile.Remove(_card.name);
+        Object.Destroy(_card.gameObject);
+        _deck.Insert(0, _card.name);
         Debug.Log($"Undid draw for card {_card}");
     }
 }

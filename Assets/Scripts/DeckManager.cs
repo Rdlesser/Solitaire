@@ -68,7 +68,7 @@ public class DeckManager : IDeckManager
     }
     
     // Draws a card from the deck
-    public GameObject DrawCard()
+    public GameObject DrawCard(IMoveManager moveManager)
     {
         if (_deck.Count > 0)
         {
@@ -88,11 +88,13 @@ public class DeckManager : IDeckManager
             selectable.FlipCard(true);
 
             _drawnCards.Add(selectable);
+            moveManager.RecordMove(new DrawMove(selectable, _drawnCards, _discardPile, _deck));
             return newCard;
         }
         else
         {
             // Reset the deck
+            
             _deck = new(_discardPile);
             // Destroy all instantiated objects in discard pile that have not been placed
             foreach (var card in _drawnCards)

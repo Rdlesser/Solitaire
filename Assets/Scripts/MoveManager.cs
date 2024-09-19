@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Abstracts;
+using Interfaces;
 
-public class MoveManager
+public class MoveManager : IMoveManager
 {
     private Stack<Move> _moves = new();
 

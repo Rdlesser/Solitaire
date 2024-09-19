@@ -10,8 +10,7 @@ namespace Interfaces
         void GenerateDeck();
         void ShuffleDeck();
         IEnumerator DealCards();
-        GameObject DrawCard();
-        List<string> GetDiscardPile();
+        GameObject DrawCard(IMoveManager moveManager);
         bool IsCardBlocked(string cardName, int cardRow);
         void MoveCardBottom(Selectable selected, Selectable target);
         void MoveCardTop(Selectable selected, Selectable target);

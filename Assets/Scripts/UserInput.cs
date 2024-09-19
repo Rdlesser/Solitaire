@@ -17,7 +17,6 @@ public class UserInput : MonoBehaviour
     }
 
     // Update is called once per frame
-
     void Update()
     {
         // Detect mouse click
@@ -132,16 +131,14 @@ public class UserInput : MonoBehaviour
         }
         else if (selectable.IsTop)  // Check if the card is in the foundation (top)
         {
-            if (_selectedCard != null)
+            if (_selectedCard == null || !_gameController.CanStackTop(_selectedCard, card))
             {
-                // Check if you can move the selected card to the foundation
-                if (_gameController.CanStackTop(_selectedCard, card))
-                {
-                    // Move card to foundation
-                    _gameController.StackCardsInTop(_selectedCard, card);
-                    DeselectCard();  // After a successful move, deselect
-                }
+                return;
             }
+
+            // Move card to foundation
+            _gameController.StackCardsInTop(_selectedCard, card);
+            DeselectCard();  // After a successful move, deselect
         }
     }
     

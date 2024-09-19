@@ -18,7 +18,7 @@ public class Solitaire : MonoBehaviour, IGameController
     [SerializeField] private UserInput _userInput;
     
     private IDeckManager _deckManager;
-    private MoveManager _moveManager;
+    private IMoveManager _moveManager;
     private GameStatistics _statistics;
     private ITracker _tracker;
     
@@ -58,14 +58,13 @@ public class Solitaire : MonoBehaviour, IGameController
     // Draws a card from the deck via the DeckManager
     public void DrawCard()
     {
-        var card = _deckManager.DrawCard();
+        var card = _deckManager.DrawCard(_moveManager);
 
         if (card == null)
         {
             return;
         }
-
-        _moveManager.RecordMove(new DrawMove(card, _deckManager.GetDiscardPile()));  // Record the draw move
+        
         _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
     }
 
@@ -237,7 +236,9 @@ public class Solitaire : MonoBehaviour, IGameController
         }
 
         // flip it over
-        selected.GetComponent<Selectable>().FlipCard(true);
+        var selectable = selected.GetComponent<Selectable>();
+        selectable.FlipCard(true);
+        _moveManager.RecordMove(new FlipMove(selectable));
 
         return true;
 
