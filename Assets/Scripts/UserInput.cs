@@ -19,9 +19,28 @@ public class UserInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        // Double-click detection logic
+        if (_clickCount == 1)
+        {
+            _timer += Time.deltaTime;
+        }
+
+        if (_clickCount == 3)
+        {
+            _timer = 0;
+            _clickCount = 1;
+        }
+
+        if (_timer > _doubleClickTime)
+        {
+            _timer = 0;
+            _clickCount = 0;
+        }
         // Detect mouse click
         if (Input.GetMouseButtonDown(0))
         {
+            _clickCount++;
             if (Camera.main == null)
             {
                 return;
@@ -50,24 +69,6 @@ public class UserInput : MonoBehaviour
             }
         }
 
-        // Double-click detection logic
-        if (_clickCount == 1)
-        {
-            _timer += Time.deltaTime;
-        }
-
-        if (_clickCount == 3)
-        {
-            _timer = 0;
-            _clickCount = 1;
-        }
-
-        if (_timer > _doubleClickTime)
-        {
-            _timer = 0;
-            _clickCount = 0;
-        }
-
         // Detect input for undo move
         if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -90,7 +91,11 @@ public class UserInput : MonoBehaviour
             }
             else if (_selectedCard == card)
             {
-                // Same card selected again, unselect it
+                if (IsDoubleClick())
+                {
+                    _gameController.AutoStack(card);
+                }
+
                 DeselectCard();
             }
             else
@@ -125,7 +130,11 @@ public class UserInput : MonoBehaviour
             }
             else if (_selectedCard == card)
             {
-                // Same card selected again, unselect it
+                if (IsDoubleClick())
+                {
+                    _gameController.AutoStack(card);
+                }
+                
                 DeselectCard();
             }
         }
@@ -218,6 +227,12 @@ public class UserInput : MonoBehaviour
     {
         _gameController.DrawCard();  // Logic for drawing new cards from the deck
     }
+    
+    private bool IsDoubleClick()
+    {
+        return _timer < _doubleClickTime && _clickCount == 2;
+    }
+    
 
     // public GameObject GetSlot1()
     // {

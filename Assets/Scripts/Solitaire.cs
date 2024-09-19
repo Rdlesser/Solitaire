@@ -172,7 +172,33 @@ public class Solitaire : MonoBehaviour, IGameController
         return true;
 
     }
-    
+
+    public void AutoStack(GameObject selected)
+    {
+        foreach (var topPosObject in _topPos)
+        {
+            var childCount = topPosObject.transform.childCount;
+            GameObject target;
+
+            if (childCount > 0)
+            {
+                var lastChild = topPosObject.transform.GetChild(childCount - 1);
+                target = lastChild.gameObject;
+
+                
+            }
+            else
+            {
+                target = topPosObject;
+            }
+            
+            if (CanStackTop(selected, target))
+            {
+                StackCardsInTop(selected, target);
+            }
+        }
+    }
+
     private bool IsBlocked(GameObject selectedCard)
     {
         var selectable = selectedCard.GetComponent<Selectable>();

@@ -11,5 +11,6 @@ namespace Interfaces
         void DrawCard();
         void UndoLastMove();
         bool TryFlip(GameObject card);
+        void AutoStack(GameObject card);
     }
 }

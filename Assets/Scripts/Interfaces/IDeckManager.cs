@@ -14,6 +14,7 @@ namespace Interfaces
         bool IsCardBlocked(string cardName, int cardRow);
         void MoveCardBottom(Selectable selected, Selectable target);
         void MoveCardTop(Selectable selected, Selectable target);
+        void TryAutoStack(GameObject selected);
     }
 
 }
