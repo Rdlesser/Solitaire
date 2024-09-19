@@ -93,14 +93,14 @@ public class DeckManager : IDeckManager
         else
         {
             // Reset the deck
-            _deck = _discardPile;
+            _deck = new(_discardPile);
             // Destroy all instantiated objects in discard pile that have not been placed
             foreach (var card in _drawnCards)
             {
                 if (card.IsInDeckPile)
                 {
                     card.gameObject.SetActive(false);
-                    Object.Destroy(card);
+                    Object.Destroy(card.gameObject);
                 }
             }
             
