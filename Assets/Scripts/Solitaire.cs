@@ -62,6 +62,7 @@ public class Solitaire : MonoBehaviour, IGameController
         if (card != null)
         {
             _moveManager.RecordMove(new DrawMove(card, _deckManager.GetDiscardPile()));  // Record the draw move
+            _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
         }
     }
 
@@ -124,20 +125,10 @@ public class Solitaire : MonoBehaviour, IGameController
     {
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
-
-        _deckManager.MoveCardBottom(selected, target.Row);
-        _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
-        
-        selected.SetRow(target.Row);
-
-        var yOffset = 0.31f;
-        if (target.Value == 0)
-        {
-            yOffset = 0;
-        }
-        selectedCard.transform.position = new Vector3(targetCard.transform.position.x, targetCard.transform.position.y - yOffset, targetCard.transform.position.z - 0.1f);
+       
         var parent = selectedCard.transform.parent;
-        selectedCard.transform.SetParent(targetCard.transform);  // Make the selected card a child of the target card
+        _deckManager.MoveCardBottom(selected, target);
+        _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
 
         // Record the move in the MoveManager (for undo purposes)
         _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
@@ -150,14 +141,9 @@ public class Solitaire : MonoBehaviour, IGameController
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
 
-        _deckManager.MoveCardTop(selected, target.Row);
-        _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
-        selected.SetRow(target.Row);
-        selected.IsTop = true;
-        
-        selectedCard.transform.position = new Vector3(targetCard.transform.position.x, targetCard.transform.position.y, targetCard.transform.position.z - 0.1f);
         var parent = selectedCard.transform.parent;
-        selectedCard.transform.SetParent(targetCard.transform);  // Make the selected card a child of the target card
+        _deckManager.MoveCardTop(selected, target);
+        _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
         
         // Record the move in the MoveManager (for undo purposes)
         _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));

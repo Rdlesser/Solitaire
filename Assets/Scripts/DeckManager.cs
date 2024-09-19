@@ -181,25 +181,39 @@ public class DeckManager : IDeckManager
         return _bottoms[cardRow].Last() == cardName;
     }
 
-    public void MoveCardBottom(Selectable selected, int targetRow)
+    public void MoveCardBottom(Selectable selected, Selectable target)
     {
+        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+        selected.SetRow(target.Row);
+        var yOffset = 0.31f;
+        if (target.Value == 0)
+        {
+            yOffset = 0;
+        }
+        selected.transform.position = new Vector3(target.transform.position.x, target.transform.position.y - yOffset, target.transform.position.z - 0.1f);
+        selected.transform.SetParent(target.transform);  // Make the selected card a child of the target card
+        
         if (selected.IsInDeckPile)
         {
             selected.IsInDeckPile = false;
             _discardPile.Remove(selected.name);
             return;
         }
-        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
     }
 
-    public void MoveCardTop(Selectable selected, int targetRow)
+    public void MoveCardTop(Selectable selected, Selectable target)
     {
+        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+        selected.SetRow(target.Row);
+        selected.IsTop = true;
+        selected.transform.position = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z - 0.1f);
+        selected.transform.SetParent(_topPos[target.Row].transform);  // Make the selected card a child of the target pile
+        
         if (selected.IsInDeckPile)
         {
             selected.IsInDeckPile = false;
+            _discardPile.Remove(selected.name);
             return;
         }
-
-        _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
-    }
+        }
 }
