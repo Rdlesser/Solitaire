@@ -47,39 +47,40 @@ public class UserInput : MonoBehaviour
     //TODO: Is this the best way to get mouse click? 
     private void GetMouseClick()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0))
         {
-            _clickCount++;
-            if (Camera.main == null)
+            return;
+        }
+
+        _clickCount++;
+        if (Camera.main == null)
+        {
+            return;
+        }
+        
+        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+        if (hit)
+        {
+            if (hit.collider.CompareTag(Tags.DECK))
             {
-                return;
+                // clicked deck
+                HandleDeckClick();
             }
-
-            var mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10));
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-
-            if (hit)
+            else if (hit.collider.CompareTag(Tags.CARD))
             {
-                if (hit.collider.CompareTag(Tags.DECK))
-                {
-                    // clicked deck
-                    HandleDeckClick();
-                }
-                else if (hit.collider.CompareTag(Tags.CARD))
-                {
-                    // clicked card
-                    HandleCardClick(hit.collider.gameObject);
-                }
-                else if (hit.collider.CompareTag(Tags.TOP))
-                {
-                    // clicked top
-                    HandleTopClick(hit.collider.gameObject);
-                }
-                else if (hit.collider.CompareTag(Tags.BOTTOM))
-                {
-                    // clicked bottom
-                    HandleBottomClick(hit.collider.gameObject);
-                }
+                // clicked card
+                HandleCardClick(hit.collider.gameObject);
+            }
+            else if (hit.collider.CompareTag(Tags.TOP))
+            {
+                // clicked top
+                HandleTopClick(hit.collider.gameObject);
+            }
+            else if (hit.collider.CompareTag(Tags.BOTTOM))
+            {
+                // clicked bottom
+                HandleBottomClick(hit.collider.gameObject);
             }
         }
     }
