@@ -1,28 +1,22 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Solitaire : MonoBehaviour
 {
-
-    [SerializeField] private Sprite[] _cardFaces;
     [SerializeField] private GameObject _cardPrefab;
     [SerializeField] private GameObject _deckButton;
     [SerializeField] private GameObject[] _bottomPos;
     [SerializeField] private GameObject[] _topPos;
     [SerializeField] private UserInput _userInput;
+    [SerializeField] private DeckManager _deckManager;
     
     private float _cardInitialYOffset = 0f;
     private float _cardYOffsetIncrement = 0.3f;
     private float _cardInitialZOffset = 0.03f;
     private float _cardZOffsetIncrement = 0.03f;
-    
-    public static string[] Suits = new string[] { "C", "D", "H", "S" };
-    public static string[] Values = new[] { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
     
     private List<string>[] _bottoms;
     private List<string>[] _tops;
@@ -44,13 +38,6 @@ public class Solitaire : MonoBehaviour
     private int _trips;
     private int _tripsRemainder;
 
-    private Dictionary<string, Sprite> _cardFaceDictionary = new();
-
-    private void OnEnable()
-    {
-        CreateCardFaceDictionary();
-    }
-
     // Start is called before the first frame update
 
     void Start()
@@ -66,17 +53,17 @@ public class Solitaire : MonoBehaviour
         
     }
 
-    private void CreateCardFaceDictionary()
-    {
-        foreach (var cardFace in _cardFaces)
-        {
-            _cardFaceDictionary[cardFace.name] = cardFace;
-        }
-    }
+    // private void CreateCardFaceDictionary()
+    // {
+    //     foreach (var cardFace in _cardFaces)
+    //     {
+    //         _cardFaceDictionary[cardFace.name] = cardFace;
+    //     }
+    // }
 
     public void PlayCards()
     {
-        _deck = GenerateDeck();
+        _deck = DeckManager.GenerateDeck();
         _deck.Shuffle();
         
         //test the cards in the deck:
@@ -90,24 +77,25 @@ public class Solitaire : MonoBehaviour
         SortDeckIntoTrips();
     }
 
-    public static List<string> GenerateDeck()
-    {
-        List<string> newDeck = new List<string>();
-
-        foreach (var suit in Suits)
-        {
-            foreach (var value in Values)
-            {
-                newDeck.Add(suit + value);
-            }
-        }
-
-        return newDeck;
-    }
+    // public static List<string> GenerateDeck()
+    // {
+    //     List<string> newDeck = new List<string>();
+    //
+    //     foreach (var suit in Suits)
+    //     {
+    //         foreach (var value in Values)
+    //         {
+    //             newDeck.Add(suit + value);
+    //         }
+    //     }
+    //
+    //     return newDeck;
+    // }
     
     public Sprite GetCardFace(string cardName)
     {
-        return _cardFaceDictionary.GetValueOrDefault(cardName);
+        return _deckManager.GetCardFace(cardName);
+        // return _cardFaceDictionary.GetValueOrDefault(cardName);
     }
 
     private IEnumerator SolitaireDeal()

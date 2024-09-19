@@ -40,7 +40,6 @@ public class Selectable : MonoBehaviour
 
         Suit = transform.name.FirstOrDefault().ToString();
         _valueString = transform.name[1..];
-        
 
         Value = _valueString switch
         {
