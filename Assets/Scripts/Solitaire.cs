@@ -59,11 +59,14 @@ public class Solitaire : MonoBehaviour, IGameController
     public void DrawCard()
     {
         var card = _deckManager.DrawCard();
-        if (card != null)
+
+        if (card == null)
         {
-            _moveManager.RecordMove(new DrawMove(card, _deckManager.GetDiscardPile()));  // Record the draw move
-            _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
+            return;
         }
+
+        _moveManager.RecordMove(new DrawMove(card, _deckManager.GetDiscardPile()));  // Record the draw move
+        _tracker.TrackEvent("DrawnCard", new Dictionary<string, string>{{"DrawnCard", $"{card}"}});
     }
 
     private void CreateCardFaceDictionary()
@@ -228,46 +231,25 @@ public class Solitaire : MonoBehaviour, IGameController
     public bool TryFlip(GameObject selected)
     {
         // if the card clicked on is not blocked}
-        if (!IsBlocked(selected))
+        if (IsBlocked(selected))
         {
-            // flip it over
-            selected.GetComponent<Selectable>().FlipCard(true);
-
-            return true;
+            return false;
         }
 
-        return false;
+        // flip it over
+        selected.GetComponent<Selectable>().FlipCard(true);
+
+        return true;
+
     }
     
     private bool IsBlocked(GameObject selectedCard)
     {
         var selectable = selectedCard.GetComponent<Selectable>();
-    
-        // if (selectable.IsInDeckPile)
-        // {
-        //     if (IsLastCardInDraw(selectable.name))
-        //     {
-        //         return false;
-        //     }
-        //     else
-        //     {
-        //         Debug.Log($"{selectable.name} is blocked!");
-        //
-        //         return true;
-        //     }
-        // }
-
-        if (IsCardBlocked(selectable.name, selectable.Row))
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return IsCardBlocked(selectable.name, selectable.Row);
     }
-    
-    public bool IsCardBlocked(string cardName, int cardRow)
+
+    private bool IsCardBlocked(string cardName, int cardRow)
     {
         return _deckManager.IsCardBlocked(cardName, cardRow);
     }
