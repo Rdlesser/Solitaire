@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using DefaultNamespace;
 using UnityEngine;
 
 public class Selectable : MonoBehaviour

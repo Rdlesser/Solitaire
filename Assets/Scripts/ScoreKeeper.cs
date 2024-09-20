@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ScoreKeeper : MonoBehaviour
@@ -16,6 +14,7 @@ public class ScoreKeeper : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // TODO: need to be triggered using event instead of using the Update() method
         if (HasWon())
         {
             ShowWinScreen();
