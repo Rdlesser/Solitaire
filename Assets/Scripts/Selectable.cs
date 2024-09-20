@@ -10,6 +10,7 @@ public class Selectable : MonoBehaviour
     public int Value { get; private set; }
     public string Suit { get; private set; }
     public bool IsFaceUp { get; private set; }
+    //TODO: IsInDeckPile and IsTop represent a card location (state) as they cannot both be true - should change this to enum functionality or something similar
     public bool IsInDeckPile { get;
         set; }
     public bool IsTop

@@ -172,6 +172,11 @@ public class Solitaire : MonoBehaviour, IGameController
 
     public void AutoStack(GameObject selected)
     {
+        if (IsBlocked(selected))
+        {
+            return;
+        }
+        
         foreach (var topPosObject in _topPos)
         {
             var childCount = topPosObject.transform.childCount;
@@ -202,7 +207,8 @@ public class Solitaire : MonoBehaviour, IGameController
     private bool IsBlocked(GameObject selectedCard)
     {
         var selectable = selectedCard.GetComponent<Selectable>();
-        return IsCardBlocked(selectable.name, selectable.Row);
+
+        return !selectable.IsInDeckPile && !selectable.IsTop && IsCardBlocked(selectable.name, selectable.Row);
     }
 
     private bool IsCardBlocked(string cardName, int cardRow)

@@ -186,12 +186,19 @@ public class DeckManager : IDeckManager
     public void MoveCardBottom(Selectable selected, Selectable target, IMoveManager moveManager)
     {
         moveManager.RecordMove(new CardMove(_discardPile, selected, _bottoms));
-        if (!selected.IsInDeckPile && !selected.IsTop)
+        if (!selected.IsInDeckPile && !selected.IsTop && _bottoms[selected.Row].Contains(selected.name))
         {
-            _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+            _bottoms[selected.Row].Remove(selected.name);
         }
         
         selected.SetRow(target.Row);
+
+        foreach (Transform child in selected.transform)
+        {
+            var selectedChild = child.GetComponent<Selectable>();
+            selectedChild.SetRow(target.Row);
+        }
+        
         var yOffset = 0.31f;
         if (target.Value == 0)
         {
@@ -204,16 +211,15 @@ public class DeckManager : IDeckManager
         {
             selected.IsInDeckPile = false;
             _discardPile.Remove(selected.name);
-            return;
         }
     }
 
     public void MoveCardTop(Selectable selected, Selectable target, IMoveManager moveManager)
     {
         moveManager.RecordMove(new CardMove(_discardPile, selected, _bottoms));
-        if (!selected.IsInDeckPile && !selected.IsTop)
+        if (!selected.IsInDeckPile && !selected.IsTop && _bottoms[selected.Row].Contains(selected.name))
         {
-            _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
+            _bottoms[selected.Row].Remove(selected.name);
         }
         
         selected.SetRow(target.Row);

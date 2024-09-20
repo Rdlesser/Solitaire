@@ -14,6 +14,7 @@ namespace Moves
         private int _originalRow;
         private List<string>[] _bottoms;
         private bool _wasTop;
+        private bool _wasContainedInBottoms;
 
         public CardMove(List<string> discardPile, Selectable card, List<string>[] bottoms)
         {
@@ -25,6 +26,7 @@ namespace Moves
             _originalRow = card.Row;
             _bottoms = bottoms;
             _wasTop = card.IsTop;
+            _wasContainedInBottoms = _bottoms[_card.Row].Contains(_card.name);
         }
 
         public override void Undo()
@@ -32,8 +34,7 @@ namespace Moves
             if (_wasInDeckPile)
             {
                 _card.IsInDeckPile = true;
-                _discardPile.Add(_card.gameObject.name);
-                return;
+                _discardPile.Add(_card.gameObject.name); 
             }
         
             _card.transform.SetParent(_originalParent);
@@ -41,7 +42,7 @@ namespace Moves
             _card.SetRow(_originalRow);
             _card.IsTop = _wasTop;
         
-            if (!_wasInDeckPile && !_wasTop)
+            if (!_wasInDeckPile && !_wasTop && _wasContainedInBottoms)
             {
                 _bottoms[_card.Row].Add(_card.name);
             }
