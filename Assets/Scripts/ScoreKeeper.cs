@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class ScoreKeeper : MonoBehaviour
@@ -21,14 +22,9 @@ public class ScoreKeeper : MonoBehaviour
         }
     }
 
-    public bool HasWon()
+    private bool HasWon()
     {
-        var numberOfCardsInTop = 0;
-
-        foreach (var topStack in _topStacks)
-        {
-            numberOfCardsInTop += topStack.Value;
-        }
+        var numberOfCardsInTop = _topStacks.Sum(topStack => topStack.transform.childCount);
 
         return numberOfCardsInTop >= 52;
     }

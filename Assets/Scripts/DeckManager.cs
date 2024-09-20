@@ -235,9 +235,4 @@ public class DeckManager : IDeckManager
         selected.IsInDeckPile = false;
         _discardPile.Remove(selected.name);
     }
-
-    public void TryAutoStack(GameObject selected)
-    {
-        
-    }
 }

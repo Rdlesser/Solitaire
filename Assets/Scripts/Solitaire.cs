@@ -208,6 +208,11 @@ public class Solitaire : MonoBehaviour, IGameController
     {
         var selectable = selectedCard.GetComponent<Selectable>();
 
+        if (selectedCard.transform.childCount == 0 && selectable.IsFaceUp)
+        {
+            return false;
+        }
+
         return !selectable.IsInDeckPile && !selectable.IsTop && IsCardBlocked(selectable.name, selectable.Row);
     }
 
