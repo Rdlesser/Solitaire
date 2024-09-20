@@ -183,8 +183,9 @@ public class DeckManager : IDeckManager
         return _bottoms[cardRow].Last() != cardName;
     }
 
-    public void MoveCardBottom(Selectable selected, Selectable target)
+    public void MoveCardBottom(Selectable selected, Selectable target, IMoveManager moveManager)
     {
+        moveManager.RecordMove(new CardMove(_discardPile, selected, _bottoms));
         if (!selected.IsInDeckPile && !selected.IsTop)
         {
             _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());
@@ -207,8 +208,9 @@ public class DeckManager : IDeckManager
         }
     }
 
-    public void MoveCardTop(Selectable selected, Selectable target)
+    public void MoveCardTop(Selectable selected, Selectable target, IMoveManager moveManager)
     {
+        moveManager.RecordMove(new CardMove(_discardPile, selected, _bottoms));
         if (!selected.IsInDeckPile && !selected.IsTop)
         {
             _bottoms[selected.Row].Remove(_bottoms[selected.Row].Last());

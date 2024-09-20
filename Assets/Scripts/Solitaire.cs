@@ -126,10 +126,8 @@ public class Solitaire : MonoBehaviour, IGameController
     {
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
-       
-        var parent = selectedCard.transform.parent;
-        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
-        _deckManager.MoveCardBottom(selected, target);
+        
+        _deckManager.MoveCardBottom(selected, target, _moveManager);
         _statistics.IncrementMoves();
         _tracker.TrackEvent("CardStacked", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
         
@@ -141,9 +139,7 @@ public class Solitaire : MonoBehaviour, IGameController
         var selected = selectedCard.GetComponent<Selectable>();
         var target = targetCard.GetComponent<Selectable>();
 
-        var parent = selectedCard.transform.parent;
-        _moveManager.RecordMove(new CardMove(selectedCard, parent.gameObject));
-        _deckManager.MoveCardTop(selected, target);
+        _deckManager.MoveCardTop(selected, target, _moveManager);
         _statistics.IncrementMoves();
         _tracker.TrackEvent("CardSentToTop", new Dictionary<string, string> { { "CardStacked", $"{selected}->{target}" } });
     }
@@ -191,11 +187,14 @@ public class Solitaire : MonoBehaviour, IGameController
             {
                 target = topPosObject;
             }
-            
-            if (CanStackTop(selected, target))
+
+            if (!CanStackTop(selected, target))
             {
-                StackCardsInTop(selected, target);
+                continue;
             }
+
+            StackCardsInTop(selected, target);
+            return;
         }
     }
 

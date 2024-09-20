@@ -12,8 +12,8 @@ namespace Interfaces
         IEnumerator DealCards();
         GameObject DrawCard(IMoveManager moveManager);
         bool IsCardBlocked(string cardName, int cardRow);
-        void MoveCardBottom(Selectable selected, Selectable target);
-        void MoveCardTop(Selectable selected, Selectable target);
+        void MoveCardBottom(Selectable selected, Selectable target, IMoveManager moveManager);
+        void MoveCardTop(Selectable selected, Selectable target, IMoveManager moveManager);
         void TryAutoStack(GameObject selected);
     }
 
