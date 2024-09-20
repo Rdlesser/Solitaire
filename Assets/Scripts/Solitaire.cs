@@ -91,7 +91,7 @@ public class Solitaire : MonoBehaviour, IGameController
     
     public bool CanStackBottom(GameObject selectedCard, GameObject targetCard)
     {
-        if (selectedCard.transform.parent == targetCard.transform)
+        if (selectedCard.transform.parent == targetCard.transform || targetCard.transform.childCount > 0)
         {
             return false;
         }
