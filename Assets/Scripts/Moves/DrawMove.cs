@@ -23,6 +23,7 @@ namespace Moves
         {
             _drawnCards.Remove(_card);
             _discardPile.Remove(_card.name);
+            // TODO: Use object pooling
             Object.Destroy(_card.gameObject);
             _deck.Insert(0, _card.name);
             Debug.Log($"Undid draw for card {_card}");

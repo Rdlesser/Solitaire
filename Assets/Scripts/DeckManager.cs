@@ -45,15 +45,7 @@ public class DeckManager : IDeckManager
             {
                 // Create a card name (e.g., "C2" for 2 of clubs)
                 var cardName = suit + value;
-
-                // // Instantiate the card prefab and set its properties
-                // var newCard = Object.Instantiate(_cardPrefab, _deckPosition.position, Quaternion.identity);
-                // newCard.name = cardName;
-
-                // Initialize the card's Selectable component with its value and suit
-                // var selectable = newCard.GetComponent<Selectable>();
-                // selectable.Initialize(GetCardValue(value), suit, false, true, _cardFaceDictionary, _cardBackSprite);
-
+                
                 // Add the card to the deck
                 _deck.Add(cardName);
             }
@@ -74,6 +66,7 @@ public class DeckManager : IDeckManager
         {
             var cardName = _deck[0];  // Get the top card from the deck
             _deck.RemoveAt(0);  // Remove it from the deck
+            // TODO: use object pooling and factory pattern...
             // Instantiate the card prefab and set its properties
             var newCard = Object.Instantiate(_cardPrefab, _drawnCardsPosition.position, Quaternion.identity, _drawnCardsPosition);
             newCard.name = cardName;
@@ -102,6 +95,7 @@ public class DeckManager : IDeckManager
                 if (card.IsInDeckPile)
                 {
                     card.gameObject.SetActive(false);
+                    // TODO: Use object pooling and factory pattern
                     Object.Destroy(card.gameObject);
                 }
             }
@@ -135,6 +129,7 @@ public class DeckManager : IDeckManager
                 // Add card to the current tableau pile
                 _bottoms[i].Add(card);
 
+                // TODO: Use object pooling and factory 
                 // Instantiate the card in the scene
                 GameObject newCard = Object.Instantiate(_cardPrefab, _deckPosition.position, Quaternion.identity, _bottomPos[i].transform);
                 newCard.name = card;
